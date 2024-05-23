@@ -39,17 +39,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 IconButton(
                   onPressed: () {
-                    todos.remove(todos[index]);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.red[900],
-                        content: Text(
-                          "Todo edited succesfully",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    );
-                    setState(() {});
+                    editDialog(context, index);
                   },
                   icon: Icon(Icons.edit),
                 ),
@@ -84,6 +74,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<dynamic> addDialog(BuildContext context) {
+    cTitle.clear();
+    cDesc.clear();
     return showDialog(
         context: context,
         builder: (conetxt) {
@@ -95,6 +87,7 @@ class _HomePageState extends State<HomePage> {
                   controller: cTitle,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
+                    labelText: 'Title',
                   ),
                 ),
                 SizedBox(
@@ -104,6 +97,7 @@ class _HomePageState extends State<HomePage> {
                     controller: cDesc,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
+                      labelText: 'Description',
                     )),
               ],
             ),
@@ -135,18 +129,22 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Future<dynamic> updateDialog(BuildContext context) {
+  Future<dynamic> editDialog(BuildContext context, int index) {
+    cTitle.text = todos[index].title!;
+    cDesc.text = todos[index].desc!;
     return showDialog(
       context: context,
       builder: (conetxt) {
         return AlertDialog(
-          title: Text("Add Todo"),
+          title: Text("Edit Todo"),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: cTitle,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
+                  labelText: 'Title',
                 ),
               ),
               SizedBox(
@@ -156,32 +154,40 @@ class _HomePageState extends State<HomePage> {
                   controller: cDesc,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
+                    labelText: 'Description',
                   )),
             ],
           ),
           actions: [
             ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('Cancel')),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
             ElevatedButton(
                 onPressed: () {
-                  var todo = Todo(title: cTitle.text, desc: cDesc.text);
-                  todos.add(todo);
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.green[900],
-                      content: Text(
-                        "Todo added succesfully",
-                        style: TextStyle(color: Colors.white),
+                  if (cTitle.text != todos[index].title ||
+                      cDesc.text != todos[index].desc) {
+                    setState(
+                      () {
+                        todos[index] =
+                            Todo(title: cTitle.text, desc: cDesc.text);
+                      },
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.green[900],
+                        content: Text(
+                          "Todo edited succesfully",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ),
-                  );
+                    );
+                  }
                   Navigator.pop(context);
                 },
-                child: Text('Add')),
+                child: Text('Save')),
           ],
         );
       },
