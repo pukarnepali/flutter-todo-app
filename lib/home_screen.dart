@@ -77,56 +77,58 @@ class _HomePageState extends State<HomePage> {
     cTitle.clear();
     cDesc.clear();
     return showDialog(
-        context: context,
-        builder: (conetxt) {
-          return AlertDialog(
-            title: Text("Add Todo"),
-            content: Column(
-              children: [
-                TextField(
-                  controller: cTitle,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Title',
-                  ),
+      context: context,
+      builder: (conetxt) {
+        return AlertDialog(
+          title: Text("Add Todo"),
+          content: Column(
+            children: [
+              TextField(
+                controller: cTitle,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Title',
                 ),
-                SizedBox(
-                  height: 12,
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              TextField(
+                controller: cDesc,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Description',
                 ),
-                TextField(
-                    controller: cDesc,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Description',
-                    )),
-              ],
-            ),
-            actions: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Cancel')),
-              ElevatedButton(
-                  onPressed: () {
-                    var todo = Todo(title: cTitle.text, desc: cDesc.text);
-                    todos.add(todo);
-                    setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.green[900],
-                        content: Text(
-                          "Todo added succesfully",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
-                  child: Text('Add')),
+              ),
             ],
-          );
-        });
+          ),
+          actions: [
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel')),
+            ElevatedButton(
+                onPressed: () {
+                  var todo = Todo(title: cTitle.text, desc: cDesc.text);
+                  todos.add(todo);
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.green[900],
+                      content: Text(
+                        "Todo added succesfully",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: Text('Add')),
+          ],
+        );
+      },
+    );
   }
 
   Future<dynamic> editDialog(BuildContext context, int index) {
@@ -151,11 +153,12 @@ class _HomePageState extends State<HomePage> {
                 height: 12,
               ),
               TextField(
-                  controller: cDesc,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Description',
-                  )),
+                controller: cDesc,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Description',
+                ),
+              ),
             ],
           ),
           actions: [
