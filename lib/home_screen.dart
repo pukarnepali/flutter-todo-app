@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'todo_model.dart';
+import 'todo_provider.dart'; // Import the provider
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,10 +13,37 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TextEditingController cTitle = TextEditingController();
   TextEditingController cDesc = TextEditingController();
-  List<Todo> todos = [
-    Todo(title: "Attend Class", desc: "Attend class at 5:30 pm"),
-    Todo(title: "Attend Class", desc: "Attend class at 5:30 pm"),
-  ];
+  List<Todo> todos = [];
+  final todoProvider provider = todoProvider();
+
+  @override
+  void initState() {
+    super.initState();
+    loadTodos();
+  }
+
+  Future<void> saveTodos() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> todosStringList =
+        todos.map((todo) => '${todo.title}|${todo.desc}').toList();
+    await prefs.setStringList('todos', todosStringList);
+  }
+
+  Future<void> loadTodos() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? todosStringList = prefs.getStringList('todos');
+    if (todosStringList != null) {
+      todos = todosStringList.map((todoString) {
+        var parts = todoString.split('|');
+        return Todo(
+          title: parts[0],
+          desc: parts[1],
+        );
+      }).toList();
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,11 +74,12 @@ class _HomePageState extends State<HomePage> {
                 IconButton(
                   onPressed: () {
                     todos.remove(todos[index]);
+                    saveTodos();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         backgroundColor: Colors.red[900],
                         content: Text(
-                          "Todo deleted succesfully",
+                          "Todo deleted successfully",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -78,10 +107,11 @@ class _HomePageState extends State<HomePage> {
     cDesc.clear();
     return showDialog(
       context: context,
-      builder: (conetxt) {
+      builder: (context) {
         return AlertDialog(
           title: Text("Add Todo"),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: cTitle,
@@ -109,15 +139,16 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: Text('Cancel')),
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   var todo = Todo(title: cTitle.text, desc: cDesc.text);
                   todos.add(todo);
+                  await saveTodos();
                   setState(() {});
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       backgroundColor: Colors.green[900],
                       content: Text(
-                        "Todo added succesfully",
+                        "Todo added successfully",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -136,7 +167,7 @@ class _HomePageState extends State<HomePage> {
     cDesc.text = todos[index].desc!;
     return showDialog(
       context: context,
-      builder: (conetxt) {
+      builder: (context) {
         return AlertDialog(
           title: Text("Edit Todo"),
           content: Column(
@@ -169,20 +200,17 @@ class _HomePageState extends State<HomePage> {
               child: Text('Cancel'),
             ),
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (cTitle.text != todos[index].title ||
                       cDesc.text != todos[index].desc) {
-                    setState(
-                      () {
-                        todos[index] =
-                            Todo(title: cTitle.text, desc: cDesc.text);
-                      },
-                    );
+                    todos[index] = Todo(title: cTitle.text, desc: cDesc.text);
+                    await saveTodos();
+                    setState(() {});
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         backgroundColor: Colors.green[900],
                         content: Text(
-                          "Todo edited succesfully",
+                          "Todo edited successfully",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
